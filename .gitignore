@@ -26,4 +26,4 @@ Thumbs.db
 *~
 
 # Generated scripts
-run.sh
+# run.sh  # 빌드 시 생성되지만 GitHub에 포함
