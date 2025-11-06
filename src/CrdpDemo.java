@@ -6,11 +6,10 @@ public class CrdpDemo {
     
     public static void main(String[] args) {
         // Default configuration
-        String host = "192.168.0.231";
+        String host = "sjrhee.ddns.net";
         int port = 32082;
         String policy = "P03";
         String data = "1234567890123";
-        String username = null;
         int timeout = 10;
         boolean showBodies = false;
         boolean verbose = false;
@@ -29,9 +28,6 @@ public class CrdpDemo {
                     break;
                 case "--data":
                     if (i + 1 < args.length) data = args[++i];
-                    break;
-                case "--username":
-                    if (i + 1 < args.length) username = args[++i];
                     break;
                 case "--timeout":
                     if (i + 1 < args.length) timeout = Integer.parseInt(args[++i]);
@@ -58,9 +54,6 @@ public class CrdpDemo {
         System.out.printf("Host: %s:%d%n", host, port);
         System.out.printf("Policy: %s%n", policy);
         System.out.printf("Data: %s%n", data);
-        if (username != null) {
-            System.out.printf("Username: %s%n", username);
-        }
         System.out.println();
         
         CrdpClient client = new CrdpClient(host, port, timeout);
@@ -106,7 +99,7 @@ public class CrdpDemo {
             
             // Step 2: Reveal
             System.out.println("2. Calling reveal API...");
-            ApiResponse revealResponse = client.reveal(policy, protectedData, externalVersion, username);
+            ApiResponse revealResponse = client.reveal(policy, protectedData, externalVersion, null);
             
             if (verbose) {
                 System.out.println("   " + revealResponse);
@@ -177,11 +170,10 @@ public class CrdpDemo {
         System.out.println("Simple CRDP protect/reveal demo");
         System.out.println();
         System.out.println("Options:");
-        System.out.println("  --host HOST          API host (default: 192.168.0.231)");
+        System.out.println("  --host HOST          API host (default: sjrhee.ddns.net)");
         System.out.println("  --port PORT          API port (default: 32082)");
         System.out.println("  --policy POLICY      Protection policy name (default: P03)");
         System.out.println("  --data DATA          Data to protect (default: 1234567890123)");
-        System.out.println("  --username USER      Username for reveal operation (optional)");
         System.out.println("  --timeout SECONDS    Request timeout in seconds (default: 10)");
         System.out.println("  --show-bodies        Show request/response bodies");
         System.out.println("  --verbose            Enable verbose output");
@@ -190,6 +182,6 @@ public class CrdpDemo {
         System.out.println("Examples:");
         System.out.println("  java CrdpDemo");
         System.out.println("  java CrdpDemo --host 10.0.0.100 --port 8080 --policy MyPolicy");
-        System.out.println("  java CrdpDemo --data \"my-secret-data\" --username testuser --verbose");
+        System.out.println("  java CrdpDemo --data \"my-secret-data\" --verbose");
     }
 }
