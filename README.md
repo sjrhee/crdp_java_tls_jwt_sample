@@ -47,6 +47,7 @@ cd crdp_java_sample
 ./run.sh --help                    # 도움말
 ./run.sh --data "9876543210987"    # 다른 데이터
 ./run.sh --host example.com        # 다른 서버
+./run.sh --port PORT               # 포트 번호
 ```
 
 ## 파일 구조
