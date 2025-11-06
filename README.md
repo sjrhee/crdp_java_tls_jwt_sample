@@ -4,9 +4,7 @@
 
 ## 주요 특징
 
-- ✅ **초보자 친화적** - 복잡한 설정 없이 간단한 구조
 - ✅ **순수 Java** - 외부 라이브러리 없이 표준 라이브러리만 사용
-- ✅ **한글 지원** - 한국 사용자를 위한 한글 메시지
 - ✅ **단순한 CLI** - 필수 옵션만 제공
 - ✅ **즉시 실행** - javac로 간단히 컴파일하여 바로 사용
 
@@ -157,14 +155,6 @@ java -cp build/classes CrdpDemo
 ./run.sh --policy P01 --data "1111222233334"
 ```
 
-<<<<<<< HEAD
-이 프로젝트는 샘플 코드로 제공됩니다.
-=======
-### 로컬 서버 테스트
-```bash
-./run.sh --host localhost --port 8080
-```
-
 ## 개발자 정보
 
 - **목적**: CRDP API 학습 및 테스트용 샘플
@@ -179,4 +169,3 @@ java -cp build/classes CrdpDemo
 
 - [Thales CipherTrust Data Protection 문서](https://thalesdocs.com/ctp/con/crdp/latest/crdp-apis/index.html)
 - [GitHub 저장소](https://github.com/sjrhee/crdp_java_sample)
->>>>>>> 674f6ed (리드미 업데이트: 리팩토링된 코드에 맞게 기본값 수정 및 정리)
