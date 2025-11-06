@@ -34,9 +34,6 @@
 
 # 도움말 확인
 ./run.sh --help
-
-# 옵션과 함께 실행
-./run.sh --host 192.168.0.231 --policy P03 --data "test-data" --verbose
 ```
 
 #### 직접 Java 실행
