@@ -126,7 +126,8 @@ public class SimpleDemo {
                 }
             }
             
-            return response.toString();
+            String responseStr = response.toString();
+            return responseStr;
             
         } catch (Exception e) {
             System.err.println("HTTP 오류: " + e.getMessage());
@@ -135,19 +136,52 @@ public class SimpleDemo {
     }
     
     /**
-     * JSON에서 값 추출
+     * JSON에서 값 추출 (더 견고한 파싱)
      */
     private static String extractValue(String json, String key) {
-        if (json == null) return null;
+        if (json == null || json.trim().isEmpty()) return null;
         
-        String pattern = "\"" + key + "\":\"";
-        int start = json.indexOf(pattern);
-        if (start == -1) return null;
+        // JSON 객체 시작과 끝 찾기
+        int startBrace = json.indexOf('{');
+        int endBrace = json.lastIndexOf('}');
+        if (startBrace == -1 || endBrace == -1 || startBrace >= endBrace) return null;
         
-        start += pattern.length();
-        int end = json.indexOf("\"", start);
-        if (end == -1) return null;
+        String content = json.substring(startBrace + 1, endBrace).trim();
         
-        return json.substring(start, end);
+        // 키-값 쌍 찾기
+        String keyPattern = "\"" + key + "\":";
+        int keyIndex = content.indexOf(keyPattern);
+        if (keyIndex == -1) return null;
+        
+        // 값 시작 위치 찾기
+        int valueStart = keyIndex + keyPattern.length();
+        
+        // 공백 건너뛰기
+        while (valueStart < content.length() && Character.isWhitespace(content.charAt(valueStart))) {
+            valueStart++;
+        }
+        
+        if (valueStart >= content.length()) return null;
+        
+        char firstChar = content.charAt(valueStart);
+        if (firstChar == '"') {
+            // 문자열 값
+            valueStart++; // 따옴표 건너뛰기
+            int valueEnd = valueStart;
+            while (valueEnd < content.length() && content.charAt(valueEnd) != '"') {
+                if (content.charAt(valueEnd) == '\\') {
+                    valueEnd++; // 이스케이프 문자 건너뛰기
+                }
+                valueEnd++;
+            }
+            return content.substring(valueStart, valueEnd);
+        } else {
+            // 숫자나 다른 값 (쉼표나 중괄호까지)
+            int valueEnd = valueStart;
+            while (valueEnd < content.length() && content.charAt(valueEnd) != ',' && content.charAt(valueEnd) != '}') {
+                valueEnd++;
+            }
+            return content.substring(valueStart, valueEnd).trim();
+        }
     }
 }
