@@ -12,7 +12,6 @@ public class CrdpDemo {
         String data = "1234567890123";
         int timeout = 10;
         boolean showBodies = false;
-        boolean verbose = false;
         
         // Parse command line arguments
         for (int i = 0; i < args.length; i++) {
@@ -34,9 +33,6 @@ public class CrdpDemo {
                     break;
                 case "--show-bodies":
                     showBodies = true;
-                    break;
-                case "--verbose":
-                    verbose = true;
                     break;
                 case "--help":
                     printHelp();
@@ -64,11 +60,7 @@ public class CrdpDemo {
             // Step 1: Protect
             System.out.println("1. Calling protect API...");
             ApiResponse protectResponse = client.protect(policy, data);
-            
-            if (verbose) {
-                System.out.println("   " + protectResponse);
-            }
-            
+
             if (showBodies) {
                 System.out.println("   Request URL: " + protectResponse.getRequestUrl());
                 System.out.println("   Request Body: " + protectResponse.getRequestBody());
@@ -91,8 +83,8 @@ public class CrdpDemo {
                 System.exit(1);
             }
             
-            System.out.printf("   SUCCESS: Protected data length = %d%n", protectedData.length());
-            if (verbose && externalVersion != null) {
+            System.out.printf("   SUCCESS: Protected data = %s%n", protectedData);
+            if (externalVersion != null) {
                 System.out.printf("   External version: %s%n", externalVersion);
             }
             System.out.println();
@@ -100,11 +92,7 @@ public class CrdpDemo {
             // Step 2: Reveal
             System.out.println("2. Calling reveal API...");
             ApiResponse revealResponse = client.reveal(policy, protectedData, externalVersion, null);
-            
-            if (verbose) {
-                System.out.println("   " + revealResponse);
-            }
-            
+
             if (showBodies) {
                 System.out.println("   Request URL: " + revealResponse.getRequestUrl());
                 System.out.println("   Request Body: " + revealResponse.getRequestBody());
@@ -157,9 +145,7 @@ public class CrdpDemo {
             
         } catch (Exception e) {
             System.err.println("ERROR: " + e.getMessage());
-            if (verbose) {
-                e.printStackTrace();
-            }
+            e.printStackTrace();
             System.exit(1);
         }
     }
@@ -176,12 +162,11 @@ public class CrdpDemo {
         System.out.println("  --data DATA          Data to protect (default: 1234567890123)");
         System.out.println("  --timeout SECONDS    Request timeout in seconds (default: 10)");
         System.out.println("  --show-bodies        Show request/response bodies");
-        System.out.println("  --verbose            Enable verbose output");
         System.out.println("  --help               Show this help message");
         System.out.println();
         System.out.println("Examples:");
         System.out.println("  java CrdpDemo");
         System.out.println("  java CrdpDemo --host 10.0.0.100 --port 8080 --policy MyPolicy");
-        System.out.println("  java CrdpDemo --data \"my-secret-data\" --verbose");
+        System.out.println("  java CrdpDemo --data \"my-secret-data\" --show-bodies");
     }
 }
