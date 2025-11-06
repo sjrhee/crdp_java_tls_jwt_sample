@@ -67,7 +67,7 @@ javac SimpleDemo.java
 
 # 실행
 java SimpleDemo
-java SimpleDemo --data "테스트데이터"
+java SimpleDemo --data "1234567890123"
 ```
 
 ## 코드 설명
