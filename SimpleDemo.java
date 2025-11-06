@@ -27,7 +27,7 @@ public class SimpleDemo {
                 data = args[++i];
             } else if ("--help".equals(args[i])) {
                 System.out.println("사용법: java SimpleDemo [옵션]");
-                System.out.println("  --host HOST     서버 주소 (기본: sjrhee.ddns.net)");
+                System.out.println("  --host HOST     서버 주소 (기본: 49.50.138.96)");
                 System.out.println("  --port PORT     포트 번호 (기본: 32082)");
                 System.out.println("  --policy POLICY 정책 이름 (기본: P01)");
                 System.out.println("  --data DATA     보호할 데이터 (기본: 1234567890123)");
