@@ -10,7 +10,7 @@ public class SimpleDemo {
     
     public static void main(String[] args) {
         // 기본 설정
-        String host = "sjrhee.ddns.net";
+        String host = "49.50.138.96";
         int port = 32082;
         String policy = "P01";
         String data = "1234567890123";
