@@ -45,11 +45,11 @@ cd crdp_java_sample
 
 ```bash
 java SimpleDemo --help                       # 도움말
-java SimpleDemo --data "9876543210987"       # 다른 데이터
-java SimpleDemo --host example.com           # 다른 서버
-java SimpleDemo --port 8080                  # 포트 번호
-java SimpleDemo --policy "P02"               # 다른 정책
-java SimpleDemo --host example.com --port 9000 --policy "P03" --data "987654321"  # 여러 옵션 조합
+java SimpleDemo --data 9876543210987         # 다른 데이터
+java SimpleDemo --host 49.50.138.96          # 다른 서버
+java SimpleDemo --port 32082                  # 포트 번호
+java SimpleDemo --policy P01               # 다른 정책
+java SimpleDemo --host 49.50.138.96 --port 32082 --policy P01 --data 1234567890123  # 여러 옵션 조합
 ```
 
 ## 파일 구조
