@@ -80,8 +80,6 @@ java SimpleDemo --data "1234567890123"
 - ✅ CLI 옵션 처리
 - ✅ CRDP API 호출 (protect/reveal)
 
-**140줄로 모든 기능 완성!**
-
 ## 관련 링크
 
 - [CRDP API 문서](https://thalesdocs.com/ctp/con/crdp/latest/crdp-apis/index.html)
