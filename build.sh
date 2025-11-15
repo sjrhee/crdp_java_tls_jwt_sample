@@ -15,11 +15,12 @@ if [ $? -eq 0 ]; then
     # 실행 스크립트 생성
     cat > run.sh << 'EOF'
 #!/bin/bash
-java SimpleDemo "$@"
+# 현재 디렉토리에서 properties 파일을 찾을 수 있도록 설정
+java -cp . SimpleDemo "$@"
 EOF
     chmod +x run.sh
     
-    echo "사용법: ./run.sh 또는 java SimpleDemo"
+    echo "사용법: ./run.sh 또는 java -cp . SimpleDemo"
     echo ""
     echo "예제:"
     echo "  ./run.sh"

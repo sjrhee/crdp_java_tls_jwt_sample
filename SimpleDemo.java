@@ -2,16 +2,42 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Properties;
 
 /**
  * 단순한 CRDP 데모 - 하나의 파일로 모든 기능 제공
  */
 public class SimpleDemo {
-    // 기본 설정값들
-    private static final String DEFAULT_HOST = "49.50.138.96";
-    private static final int DEFAULT_PORT = 32082;
-    private static final String DEFAULT_POLICY = "P01";
-    private static final String DEFAULT_DATA = "1234567890123";
+    private static Properties config = new Properties();
+    
+    // 기본 설정값들 (properties 파일에서 로드됨)
+    private static String DEFAULT_HOST = "49.50.138.96";
+    private static int DEFAULT_PORT = 32082;
+    private static String DEFAULT_POLICY = "P01";
+    private static String DEFAULT_DATA = "1234567890123";
+    private static int DEFAULT_TIMEOUT = 10;
+    
+    static {
+        // SimpleDemo.properties 파일 로드
+        try (InputStream input = SimpleDemo.class.getClassLoader()
+                .getResourceAsStream("SimpleDemo.properties")) {
+            if (input != null) {
+                config.load(input);
+                
+                // properties 파일에서 설정값 읽기
+                DEFAULT_HOST = config.getProperty("host", DEFAULT_HOST);
+                DEFAULT_PORT = Integer.parseInt(
+                    config.getProperty("port", String.valueOf(DEFAULT_PORT)));
+                DEFAULT_POLICY = config.getProperty("policy", DEFAULT_POLICY);
+                DEFAULT_DATA = config.getProperty("data", DEFAULT_DATA);
+                DEFAULT_TIMEOUT = Integer.parseInt(
+                    config.getProperty("timeout", String.valueOf(DEFAULT_TIMEOUT)));
+            }
+        } catch (IOException e) {
+            // properties 파일이 없으면 기본값 사용
+            System.err.println("경고: SimpleDemo.properties 파일을 찾을 수 없습니다. 기본값을 사용합니다.");
+        }
+    }
     
     /**
      * 도움말 출력
