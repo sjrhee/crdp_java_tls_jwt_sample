@@ -14,8 +14,52 @@
 
 - Java 8+
 - OpenSSL (키 생성 시)
+- **⚠️ CTM 관리자**: CRDP 서버의 JWT 검증 설정 필요 (아래 참고)
 
-## 30초 빠른 시작
+---
+
+## ⚠️ CTM 관리자 필독 (전제 조건)
+
+이 클라이언트를 사용하기 전에 **CTM CRDP 서버에서 JWT 검증을 활성화**해야 합니다.
+
+### 설정 위치
+**CTM Console → CRDP Application → JWT Verification 설정**
+
+### 상세 설정 방법
+📘 [Thales CTM CRDP 관리 가이드](https://thalesdocs.com/ctp/cm/latest/admin/adp_ag/adp-cm-crdp/defn-app-crdp/index.html)를 참고하여 다음을 수행하세요:
+
+1. **CTM Console** 접속
+2. **Administration** → **Applications** → **CRDP** 선택
+3. **JWT Verification** 섹션에서:
+   - ✅ **Enable JWT Verification** 활성화
+   - 🔑 **Public Key** 설정 (클라이언트의 공개키 `keys/jwt_key_public.pem` 내용 복사)
+   - 🔐 **Signature Algorithm** 설정 (RS256, ES256 등 - 클라이언트와 동일해야 함)
+   - 💬 **Required Claims** 설정 (필요한 클레임 정의)
+
+### 클라이언트 측 확인
+```bash
+# 공개키 확인 (CTM에 입력할 내용)
+cat keys/jwt_key_public.pem
+
+# 알고리즘 확인 (config.yaml에서)
+cat config.yaml | grep algorithm
+
+# 토큰 클레임 확인 (decode)
+python3 -c "
+import base64, json
+token = open('keys/jwt_token.txt').read().strip()
+parts = token.split('.')
+payload = json.loads(base64.urlsafe_b64decode(parts[1] + '=='))
+print(json.dumps(payload, indent=2))
+"
+```
+
+**문제 발생 시:**
+- `token is missing required claim` → CTM에서 Required Claims 설정 확인
+- `token signature is invalid` → 공개키가 정확히 입력되었는지 확인
+- `unsupported algorithm` → 알고리즘 설정이 일치하는지 확인
+
+---
 
 ```bash
 # 1️⃣ 키 생성 및 토큰 생성 (Python 또는 OpenSSL)
