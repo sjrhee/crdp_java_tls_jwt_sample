@@ -1,34 +1,39 @@
 # CRDP Java Simple Demo
 
-**단 하나의 파일**로 CRDP API 테스트하기!
+**단 하나의 파일**로 CRDP API 테스트하기! HTTPS/TLS + JWT 인증 지원
 
 ## ✨ 특징
 
 - 🚀 **하나의 파일** - SimpleDemo.java 만으로 모든 기능
 - 📦 **외부 의존성 없음** - 순수 Java만 사용
 - ⚡ **빠른 실행** - 컴파일하고 바로 실행
+- 🔐 **HTTPS/TLS** - 자체 서명 인증서 지원
+- 🎫 **JWT 인증** - RS256 (RSA + SHA256)
 
 ## 요구사항
 
 - Java 8+
+- OpenSSL (키 생성 시)
 
-## 30초 시작
+## 30초 빠른 시작
 
 ```bash
-# 다운로드
-git clone https://github.com/sjrhee/crdp_java_sample.git
-cd crdp_java_sample
+# 1️⃣ 키 생성 및 토큰 생성 (Python 또는 OpenSSL)
+python3 create_jwt.py
+# 또는 수동: openssl genrsa -out jwt_signing_key.pem 2048
 
-# 빌드 & 실행
-./build.sh
-./run.sh
+# 2️⃣ SimpleDemo.properties에 토큰 설정
+vi SimpleDemo.properties
+
+# 3️⃣ 클라이언트 테스트 (공개키 배포 완료 후)
+java SimpleDemo
 ```
 
 ## 출력 예시
 
 ```
 === CRDP 간단 데모 ===
-서버: 49.50.138.96:32082
+서버: https://192.168.0.233:32182
 정책: P01
 데이터: 1234567890123
 
@@ -41,18 +46,19 @@ cd crdp_java_sample
    일치: 예
 ```
 
-## 옵션
+## 빠른 테스트
 
 ```bash
-java SimpleDemo --help                       # 도움말
-java SimpleDemo --data 9876543210987         # 다른 데이터
-java SimpleDemo --host 49.50.138.96          # 다른 서버
-java SimpleDemo --port 32082                  # 포트 번호
-java SimpleDemo --policy P01               # 다른 정책
-java SimpleDemo --host 49.50.138.96 --port 32082 --policy P01 --data 1234567890123  # 여러 옵션 조합
-```
+# 1️⃣ 키 생성 및 토큰 생성
+python3 create_jwt.py
 
-## 설정 관리 (Properties 파일)
+# 2️⃣ Java 클라이언트 테스트 (공개키 배포 후)
+java SimpleDemo
+
+# 3️⃣ (선택) Python으로 다른 알고리즘 테스트
+# config.yaml에서 algorithm 변경 후 다시 실행
+python3 create_jwt.py
+```
 
 ### SimpleDemo.properties 파일
 
@@ -60,10 +66,13 @@ java SimpleDemo --host 49.50.138.96 --port 32082 --policy P01 --data 12345678901
 
 ```properties
 # 서버 주소
-host=49.50.138.96
+host=192.168.0.233
 
 # 서버 포트
-port=32082
+port=32182
+
+# TLS/HTTPS 활성화
+tls=true
 
 # 보호 정책명
 policy=P01
@@ -73,60 +82,98 @@ data=1234567890123
 
 # HTTP 타임아웃 (초 단위)
 timeout=10
+
+# JWT Bearer 토큰 (setup_jwt.sh에서 자동 생성)
+token=eyJhbGciOiJSUzI1NiIs...
 ```
 
 ### 사용 방법
 
-1. **기본값 사용** (properties 파일 적용됨)
-```bash
-./run.sh
-```
-
-2. **설정 파일 변경 후 실행**
-```bash
-# SimpleDemo.properties 파일 수정
-vim SimpleDemo.properties
-
-# 변경된 설정으로 실행 (재컴파일 불필요)
-./run.sh
-```
-
-3. **명령행 옵션으로 덮어쓰기** (properties 설정보다 우선)
-```bash
-./run.sh --data "다른데이터"        # properties의 data 값 무시
-./run.sh --host 192.168.1.1        # properties의 host 값 무시
-```
-
-### 우선순위
-
-**명령행 옵션 > properties 파일 > 하드코딩된 기본값**
-
-- 명령행에서 지정한 옵션이 최우선
-- properties 파일의 설정값이 그 다음
-- properties 파일이 없으면 코드의 기본값 사용
-
-### 환경별 설정
-
-서로 다른 환경에 맞는 properties 파일을 관리할 수 있습니다:
+SimpleDemo.properties 파일을 수정하면 재컴파일 없이 설정이 적용됩니다:
 
 ```bash
-# 개발 환경
-cp SimpleDemo-dev.properties SimpleDemo.properties
-./run.sh
+# 1. 파일 수정
+vi SimpleDemo.properties
 
-# 운영 환경
-cp SimpleDemo-prod.properties SimpleDemo.properties
-./run.sh
+# 2. 실행 (변경된 설정 자동 적용)
+java SimpleDemo
 ```
 
 ## 파일 구조
 
 ```
 .
-├── SimpleDemo.java            # 🎯 모든 기능이 여기 있음!
-├── SimpleDemo.properties      # ⚙️ 설정 파일 (properties)
-├── build.sh                   # 빌드 스크립트
-└── run.sh                      # 실행 스크립트 (빌드 후 생성)
+├── SimpleDemo.java              # 🎯 Java CRDP 클라이언트
+├── SimpleDemo.properties        # ⚙️ Java 설정 파일
+├── create_jwt.py                # 🐍 Python JWT 생성 (RS/EC/PSS)
+├── config.yaml                  # ⚙️ Python 설정 파일
+└── keys/                        # 생성된 키 저장소
+    ├── jwt_signing_key.pem      # 개인키 (🔒 비밀)
+    ├── jwt_signing_pub.pem      # 공개키 (배포용)
+    └── jwt_token.txt            # 생성된 JWT 토큰
+```
+
+## 생성 파일
+
+```
+jwt_signing_key.pem              # 개인키 (🔒 비밀 보관)
+jwt_signing_pub.pem              # 공개키 (서버에 배포)
+```
+
+## JWT 생성 - 두 가지 방법
+
+### 1️⃣ Python 스크립트 (create_jwt.py) - 권장 ⭐
+
+**더 많은 알고리즘 지원** - RS256, ES256, PS256 등
+
+```bash
+# 필수 설정 (선택사항)
+pip install PyYAML  # config.yaml 파싱 시 사용
+
+# 실행
+python3 create_jwt.py
+```
+
+**특징:**
+- config.yaml에서 알고리즘 선택 가능
+  - RSA: RS256, RS384, RS512
+  - ECDSA: ES256, ES384, ES512  
+  - RSA-PSS: PS256, PS384, PS512
+- OpenSSL 기반 (외부 라이브러리 불필요)
+- JWT 토큰을 keys/jwt_token.txt에 저장
+
+**config.yaml 설정:**
+```yaml
+algorithm: RS256        # RS256, ES256, PS256 등
+issuer: "CRDP03"
+user_id: "user01"
+expiry_days: 30
+key_dir: "./keys"
+use_existing_keys: false
+```
+
+### 2️⃣ 수동 (OpenSSL)
+
+**완전한 제어** - 세세한 설정 가능
+
+```bash
+# 1. RSA 키 생성 (2048 비트)
+openssl genrsa -out jwt_signing_key.pem 2048
+openssl rsa -in jwt_signing_key.pem -pubout -out jwt_signing_pub.pem
+
+# 2. JWT 페이로드 생성 (JSON)
+echo '{"iss":"issuer","sub":"user01","iat":'$(date +%s)',"exp":'$(($(date +%s)+3600))'}' > payload.json
+
+# 3. Base64URL 인코딩 (헤더 + 페이로드)
+HEADER=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64 | tr '+/' '-_' | tr -d '=')
+PAYLOAD=$(cat payload.json | base64 | tr '+/' '-_' | tr -d '=')
+
+# 4. 서명 생성
+SIGNATURE=$(echo -n "$HEADER.$PAYLOAD" | openssl dgst -sha256 -sign jwt_signing_key.pem | base64 | tr '+/' '-_' | tr -d '=')
+
+# 5. JWT 토큰 조합
+JWT="$HEADER.$PAYLOAD.$SIGNATURE"
+echo $JWT
 ```
 
 ## 수동 실행
@@ -142,222 +189,31 @@ java SimpleDemo --data "1234567890123"
 
 ## 코드 설명
 
-`SimpleDemo.java` 하나의 파일에:
-- ✅ HTTP 클라이언트
-- ✅ JSON 파싱
-- ✅ CLI 옵션 처리
-- ✅ CRDP API 호출 (protect/reveal)
+`SimpleDemo.java` - 모든 기능이 포함된 단일 파일
 
-## Protect/Reveal 구현 방법
+**주요 메서드:**
 
-### 1️⃣ HTTP POST 요청 (`post()` 메서드)
+- `main()` - 프로그램 진입점, properties 파일 로드
+- `protect()` - /v1/protect API 호출 (데이터 보호)
+- `reveal()` - /v1/reveal API 호출 (데이터 복원)
+- `post()` - HTTP/HTTPS POST 요청 처리
+- `extractValue()` - JSON 응답에서 값 추출
 
-```java
-private static String post(String urlString, String json) {
-    try {
-        URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        
-        // HTTP 설정
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
-        conn.setConnectTimeout(10000);  // 10초 타임아웃
-        
-        // JSON 요청 전송
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(json.getBytes(StandardCharsets.UTF_8));
-        }
-        
-        // 응답 읽기
-        int status = conn.getResponseCode();
-        InputStream is = (status >= 200 && status < 300) 
-            ? conn.getInputStream() 
-            : conn.getErrorStream();
-        
-        // 응답 본문 파싱
-        StringBuilder response = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(
-            new InputStreamReader(is, StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                response.append(line);
-            }
-        }
-        
-        return response.toString();
-    } catch (Exception e) {
-        System.err.println("HTTP 오류: " + e.getMessage());
-        return null;
-    }
-}
-```
+**특징:**
 
-**핵심 포인트:**
-- `HttpURLConnection` 사용 (외부 라이브러리 불필요)
-- JSON 데이터를 UTF-8로 인코딩하여 전송
-- 성공(200-299)과 오류(4xx, 5xx) 응답 구분 처리
+- ✅ 순수 Java (외부 의존성 없음)
+- ✅ HTTPS 지원 (자체 서명 인증서 자동 처리)
+- ✅ JWT Bearer 토큰 인증
+- ✅ JSON 파싱 (간단한 수동 파서)
+- ✅ 설정 파일 기반 (properties)
 
-### 2️⃣ Protect (데이터 보호)
+## 문서
 
-```java
-private static String protect(String host, int port, String policy, String data) {
-    String url = "http://" + host + ":" + port + "/v1/protect";
-    String json = "{\"protection_policy_name\":\"" + policy 
-        + "\",\"data\":\"" + data + "\"}";
-    String response = post(url, json);
-    return extractValue(response, "protected_data");
-}
-```
-
-**요청 JSON 형식:**
-```json
-{
-  "protection_policy_name": "P01",
-  "data": "1234567890123"
-}
-```
-
-**응답 JSON 형식:**
-```json
-{
-  "protected_data": "435b7e99fdf33e10a29e4708710cacc2"
-}
-```
-
-**프로세스:**
-1. 정책 이름과 보호할 데이터를 JSON으로 포장
-2. `/v1/protect` 엔드포인트에 POST 요청
-3. 응답에서 `protected_data` 필드 추출 (암호화/토큰화된 값)
-
-### 3️⃣ Reveal (데이터 복원)
-
-```java
-private static String reveal(String host, int port, String policy, String protectedData) {
-    String url = "http://" + host + ":" + port + "/v1/reveal";
-    String json = "{\"protection_policy_name\":\"" + policy 
-        + "\",\"protected_data\":\"" + protectedData + "\"}";
-    String response = post(url, json);
-    return extractValue(response, "data");
-}
-```
-
-**요청 JSON 형식:**
-```json
-{
-  "protection_policy_name": "P01",
-  "protected_data": "435b7e99fdf33e10a29e4708710cacc2"
-}
-```
-
-**응답 JSON 형식:**
-```json
-{
-  "data": "1234567890123"
-}
-```
-
-**프로세스:**
-1. 정책 이름과 보호된 데이터를 JSON으로 포장
-2. `/v1/reveal` 엔드포인트에 POST 요청
-3. 응답에서 `data` 필드 추출 (복원된 원본 데이터)
-
-### 4️⃣ JSON 파싱 (`extractValue()` 메서드)
-
-```java
-private static String extractValue(String json, String key) {
-    if (json == null || json.trim().isEmpty()) return null;
-    
-    // JSON 객체 범위 찾기
-    int startBrace = json.indexOf('{');
-    int endBrace = json.lastIndexOf('}');
-    if (startBrace == -1 || endBrace == -1 || startBrace >= endBrace) 
-        return null;
-    
-    String content = json.substring(startBrace + 1, endBrace).trim();
-    
-    // "key": 패턴 찾기
-    String keyPattern = "\"" + key + "\":";
-    int keyIndex = content.indexOf(keyPattern);
-    if (keyIndex == -1) return null;
-    
-    int valueStart = keyIndex + keyPattern.length();
-    
-    // 공백 건너뛰기
-    while (valueStart < content.length() 
-        && Character.isWhitespace(content.charAt(valueStart))) {
-        valueStart++;
-    }
-    
-    if (valueStart >= content.length()) return null;
-    
-    // 문자열 값 추출 (따옴표로 감싼 경우)
-    char firstChar = content.charAt(valueStart);
-    if (firstChar == '"') {
-        valueStart++;
-        int valueEnd = valueStart;
-        while (valueEnd < content.length() 
-            && content.charAt(valueEnd) != '"') {
-            if (content.charAt(valueEnd) == '\\') {
-                valueEnd++;  // 이스케이프 문자 건너뛰기
-            }
-            valueEnd++;
-        }
-        return content.substring(valueStart, valueEnd);
-    }
-    
-    return null;
-}
-```
-
-**JSON 파싱 전략:**
-- 외부 JSON 라이브러리 사용 안 함 (gson, jackson 등)
-- 문자열 기반 파싱으로 단순성 유지
-- 이스케이프 문자(`\"`) 처리
-- 쉼표와 중괄호를 경계로 하여 값 추출
-
-### 완전한 워크플로우
-
-```
-1. 입력 데이터: "1234567890123"
-   ↓
-2. Protect API 호출 (암호화/토큰화)
-   URL: http://49.50.138.96:32082/v1/protect
-   JSON: {"protection_policy_name":"P01","data":"1234567890123"}
-   ↓
-3. 보호된 데이터 수신: "435b7e99fdf33e10a29e4708710cacc2"
-   ↓
-4. Reveal API 호출 (복호화/디토큰화)
-   URL: http://49.50.138.96:32082/v1/reveal
-   JSON: {"protection_policy_name":"P01","protected_data":"435b7e99fdf33e10a29e4708710cacc2"}
-   ↓
-5. 복원된 데이터 수신: "1234567890123"
-   ↓
-6. 검증: 원본 == 복원 ✓
-```
-
-### 에러 처리
-
-```java
-// HTTP 오류 처리
-if (status < 200 || status >= 300) {
-    System.err.println("실패: HTTP " + status);
-    return null;
-}
-
-// JSON 파싱 실패 처리
-if (protectedData == null) {
-    System.err.println("실패: 보호된 데이터를 찾을 수 없음");
-    return null;
-}
-
-// 네트워크 오류 처리
-catch (Exception e) {
-    System.err.println("오류: " + e.getMessage());
-}
-```
+- 📖 [JWT_GUIDE.md](./JWT_GUIDE.md) - JWT 생성 및 검증 상세 가이드
+- ⚡ [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) - 명령어 빠른 참조
 
 ## 관련 링크
 
-- [CRDP API 문서](https://thalesdocs.com/ctp/con/crdp/latest/crdp-apis/index.html)
-- [GitHub 저장소](https://github.com/sjrhee/crdp_java_sample)
+- 📘 [CRDP API 공식 문서](https://thalesdocs.com/ctp/con/crdp/latest/crdp-apis/index.html)
+- 🔐 [JWT.io - JWT 토큰 디버거](https://jwt.io)
+- 🔑 [OpenSSL 공식 사이트](https://www.openssl.org/)

@@ -24,6 +24,3 @@ Thumbs.db
 *.bak
 *.swp
 *~
-
-# Generated scripts
-# run.sh  # 빌드 시 생성되지만 GitHub에 포함
