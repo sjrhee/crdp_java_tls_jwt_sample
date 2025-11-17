@@ -90,33 +90,18 @@ java SimpleDemo
    일치: 예
 ```
 
-## 빠른 테스트
+## 설정 관리 (SimpleDemo.properties)
 
-```bash
-# 1️⃣ 키 생성 및 토큰 생성
-python3 create_jwt.py
+**모든 설정은 SimpleDemo.properties 파일에서 관리합니다** (명령어 줄 옵션 없음)
 
-# 2️⃣ Java 클라이언트 테스트 (공개키 배포 후)
-java SimpleDemo
-
-# 3️⃣ (선택) Python으로 다른 알고리즘 테스트
-# config.yaml에서 algorithm 변경 후 다시 실행
-python3 create_jwt.py
-```
-
-### SimpleDemo.properties 파일
-
-기본값을 외부 설정 파일에서 관리할 수 있습니다:
+### 설정 파일 예시
 
 ```properties
-# 서버 주소
+# CRDP 서버 주소
 host=192.168.0.233
 
-# 서버 포트
+# CRDP 서버 포트
 port=32182
-
-# TLS/HTTPS 활성화
-tls=true
 
 # 보호 정책명
 policy=P01
@@ -125,23 +110,29 @@ policy=P01
 data=1234567890123
 
 # HTTP 타임아웃 (초 단위)
-timeout=10
+timeout=2
 
-# JWT Bearer 토큰 (setup_jwt.sh에서 자동 생성)
-token=eyJhbGciOiJSUzI1NiIs...
+# HTTPS/TLS 활성화
+tls=true
+
+# JWT Bearer 토큰 (create_jwt.py에서 생성)
+token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 ### 사용 방법
 
-SimpleDemo.properties 파일을 수정하면 재컴파일 없이 설정이 적용됩니다:
-
 ```bash
-# 1. 파일 수정
+# 1. 파일 수정 (원하는 설정값 변경)
 vi SimpleDemo.properties
 
-# 2. 실행 (변경된 설정 자동 적용)
+# 2. 재컴파일 불필요 - 바로 실행
 java SimpleDemo
 ```
+
+**⚠️ 주의:**
+- 명령어 줄 옵션은 지원하지 않습니다
+- 모든 설정은 SimpleDemo.properties에서만 관리합니다
+- 파일 수정 후 재컴파일 불필요
 
 ## 파일 구조
 
@@ -226,9 +217,8 @@ echo $JWT
 # 컴파일
 javac SimpleDemo.java
 
-# 실행
+# 실행 (모든 설정은 SimpleDemo.properties에서 읽음)
 java SimpleDemo
-java SimpleDemo --data "1234567890123"
 ```
 
 ## 코드 설명
